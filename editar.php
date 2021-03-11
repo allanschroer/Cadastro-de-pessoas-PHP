@@ -52,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         //consulta para verificar duplicidade
         $consulta_cpf = $conexao->query("SELECT * FROM `cadastro` WHERE `cpf` LIKE '$cpf_formatado'");
 
-      if(mysqli_num_rows($consulta_cpf) > 0){
+      if(mysqli_num_rows($consulta_cpf) > 1){
         $cpfErr = "O CPF inserido já existe.";
       }
       else{
@@ -68,31 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   
 
   //formata telefone
-  $area_telefone = ($_POST["area_telefone"]);
-  $area_telefone = preg_replace("/[^0-9]/","" ,$area_telefone);
-  
-
-  if (strlen($area_telefone)>2) {
-    $areaErr = "DDD invalido.";
-    $area_telefone = "";
-  }
-  else{
-    $area_telefone = "(".$area_telefone.")";
-  }
-
   $telefone = ($_POST["telefone"]);
-  $telefone = preg_replace("/[^0-9]/","" ,$telefone);
-
-  if (strlen($telefone)>=8 and strlen($telefone)<10) {
-    $parte_1 = substr($telefone, 0,-4);
-    $parte_2 = substr($telefone, -4, 4);
-    $telefone = $area_telefone.$parte_1."-".$parte_2;
-  }
-  else{
-    $telefoneErr = "Telefone não é valido";
-    $telefone = "";
-    $area_telefone = "";
-  }
   
 
 
@@ -114,15 +90,12 @@ function testa_input($data) {
 }
 
 
-
-
-
 while ($linha = mysqli_fetch_array($exibicao)) {?>
 <?php 
-if ($linha['id_cliente'] == $_GET['editar']) {?>
+if ($linha['id_cliente'] == $_GET['id']) {?>
 
     <h2 class ="espaco_titulo">Editar cadastro:</h2>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+    <form method="post" action="">
 
     <input type="hidden" name ="id_cliente" value ="<?php echo $linha['id_cliente']?>"></input>
     <label>NOME COMPLETO:</label><br>
@@ -146,13 +119,15 @@ if ($linha['id_cliente'] == $_GET['editar']) {?>
     <input type="submit" value="Atualizar"><br>
 <?php
 }
+}
+
+
+
 if ($soma_verificacao >= 3) {
-    $query = "UPDATE `cadastro` SET `nome` = '$nome', `data_nascimento` = '$nascimento', `cpf` = '$cpf_formatado', `telefone` = '$telefone', `email` = '$email' WHERE `cadastro`.`id_cliente` = $id_cliente";
+    $id = $_GET['id'];
+    $query = "UPDATE `cadastro` SET `nome` = '$nome', `data_nascimento` = '$nascimento', `cpf` = '$cpf_formatado', `telefone` = '$telefone', `email` = '$email' WHERE `cadastro`.`id_cliente` = '$id'";
     mysqli_query($conexao, $query);
-    #('location:'.$_SERVER['HTTP_REFERER'].'');
-    
-  
+    header('location:'.$_SERVER['HTTP_REFERER'].'');  
     echo "Cadastro editado com sucesso!";
   } 
-}
 
