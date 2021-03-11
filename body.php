@@ -22,8 +22,8 @@
 							echo '<td>'.$linha['cpf'].'</td>';
 							echo '<td>'.$linha['telefone'].'</td>';
 							echo '<td>'.$linha['email'].'</td>';
-							echo '<td><a href="editar.php&id='.$linha['id_cliente'].'"><button>Editar</button></td>';
-							echo '<td><a href="deletar.php&id='.$linha['id_cliente'].'"><button>Deletar</button></td>';
+							echo '<td><a href="editar.php?&id='.$linha['id_cliente'].'"><button>Editar</button></td>';
+							echo '<td><a href="deletar.php?&id='.$linha['id_cliente'].'"><button>Deletar</button></td>';
 						}
 
 					?>
