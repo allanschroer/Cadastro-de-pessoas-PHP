@@ -1,10 +1,11 @@
 
 <?php
-include 'header.php';
+#include 'header.php';
 include 'db.php';
+include 'header.php';
 
-// define variaveis
-$nomeErr = $nascimentoErr = $cpfErr = $emailErr = "";
+// define variaveis vazias
+$nomeErr = $nascimentoErr = $cpfErr = $emailErr = $areaErr = $telefoneErr = "";
 $nome = $nascimento = $cpf = $telefone = $email = $cpf_formatado = "";
 $soma_verificacao = 0;
 
@@ -12,7 +13,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   //verifica o nome
   if (empty($_POST["nome"])) {
     $nomeErr = "Nome é um campo obrigatório.";
-  } else {
+  } 
+  else {
     $nome = testa_input($_POST["nome"]);
     // checa se tem apenas caracteres
     if (!preg_match("/^[a-zA-Z ]*$/",$nome)) {
@@ -21,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $soma_verificacao =+1;
       }
     
-  }
+    }
   //verifica a data de nascimento
     if (empty($_POST["nascimento"])) {
     $nascimentoErr = "Data de nascimento é obrigatório";
@@ -29,38 +31,69 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nascimento = testa_input($_POST["nascimento"]);
     $soma_verificacao +=1;
   }
+
+
   //verifica o CPF
-      if (empty($_POST["cpf"])) {
-    $cpfErr = "CPF é obrigatório.";
+    if (empty($_POST["cpf"])) {
+      $cpfErr = "CPF é obrigatório.";
   } else {
-    $cpf = testa_input($_POST["cpf"]);
-    //retira qualquer coisa que nao seja numero do cpf
-    $cpf = preg_replace("/[^0-9]/","" ,$cpf);
+      $cpf = testa_input($_POST["cpf"]);
+      //retira qualquer coisa que nao seja numero do cpf
+      $cpf = preg_replace("/[^0-9]/","" ,$cpf);
 
-    if (strlen($cpf)==11) {
-      $bloco_1 = substr($cpf,0,3);
-      $bloco_2 = substr($cpf,3,3);
-      $bloco_3 = substr($cpf,6,3);
-      $dig_verificador = substr($cpf,-2);
-      $cpf_formatado = $bloco_1.".".$bloco_2.".".$bloco_3."-".$dig_verificador;
+      //coloca pontuação no cpf
+      if (strlen($cpf)==11) {
+        $bloco_1 = substr($cpf,0,3);
+        $bloco_2 = substr($cpf,3,3);
+        $bloco_3 = substr($cpf,6,3);
+        $dig_verificador = substr($cpf,-2);
+        $cpf_formatado = $bloco_1.".".$bloco_2.".".$bloco_3."-".$dig_verificador;
 
-
-      $consulta_cpf = $conexao->query("SELECT * FROM `cadastro` WHERE `cpf` LIKE '$cpf_formatado'");
+        //consulta para verificar duplicidade
+        $consulta_cpf = $conexao->query("SELECT * FROM `cadastro` WHERE `cpf` LIKE '$cpf_formatado'");
 
       if(mysqli_num_rows($consulta_cpf) > 0){
         $cpfErr = "O CPF inserido já existe.";
       }
       else{
         $soma_verificacao +=1;
-    }}
-    else{
-      $cpfErr = "O CPF digitado é invalido.";
+      }
     }
-    //coloca pontuação no cpf
+      else{
+        $cpfErr = "O CPF digitado é invalido.";
+    }
+  
 
   }
-  //coloca mascara no telefone
+  
 
+  //formata telefone
+  $area_telefone = ($_POST["area_telefone"]);
+  $area_telefone = preg_replace("/[^0-9]/","" ,$area_telefone);
+  
+
+  if (strlen($area_telefone)>2) {
+    $areaErr = "DDD invalido.";
+    $area_telefone = "";
+  }
+  else{
+    $area_telefone = "(".$area_telefone.")";
+  }
+
+  $telefone = ($_POST["telefone"]);
+  $telefone = preg_replace("/[^0-9]/","" ,$telefone);
+
+  if (strlen($telefone)>=8 and strlen($telefone)<10) {
+    $parte_1 = substr($telefone, 0,-4);
+    $parte_2 = substr($telefone, -4, 4);
+    $telefone = $area_telefone.$parte_1."-".$parte_2;
+  }
+  else{
+    $telefoneErr = "Telefone não é valido";
+    $telefone = "";
+    $area_telefone = "";
+  }
+  
 
 
   //verifica o e-mail
@@ -70,9 +103,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $emailErr = "E-Mail precisa ser válido.";
       $email = "";
     }
+  }
 
-}
-
+  //função para testar o input
 function testa_input($data) {
   $data = trim($data);
   $data = stripslashes($data);
@@ -82,7 +115,10 @@ function testa_input($data) {
 
 
 
-// FORMULARIO DE CADASTRO?>
+// FORMULARIO DE CADASTRO
+
+?>
+
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
   <label>NOME COMPLETO:</label><br>
   <input type="text" name="nome" placeholder="Nome do cadastro">
@@ -93,28 +129,26 @@ function testa_input($data) {
   <label>CPF:</label><br>
   <input type="text" name="cpf" placeholder="Nº do CPF">
   <span class="error">* <?php echo $cpfErr;?></span><br><br>
+  <label>ÁREA:</label><br>
+  <input type="text" name="area_telefone" placeholder="Área" class="area_telefone"></input><span class="error"><?php echo $areaErr;?></span><br>
   <label>TELEFONE:</label><br>
-  <input type="text" name="telefone" placeholder="Telefone com área"><br><br>
+  <input type="text" name="telefone" placeholder="Telefone"><span class="error"><?php echo $telefoneErr;?></span><br><br>
   <label>EMAIL:</label><br>
   <input type="text" name="email" placeholder="E-mail">
   <span class="error"> <?php echo $emailErr;?></span><br><br>
   <input type="submit" value="Cadastrar"><br>
-
-
 </form>
 
-
-
-
 <?php
-
-
 
 //CHECAGEM DE CAMPOS PREENCHIDOS
 if ($soma_verificacao >= 3) {
   $query = "INSERT INTO `cadastro` (`id_cliente`, `nome`, `data_nascimento`, `cpf`, `telefone`, `email`) VALUES (NULL, '$nome', '$nascimento', '$cpf_formatado', '$telefone', '$email')";
   mysqli_query($conexao, $query);
 
+  header('location:'.$_SERVER['HTTP_REFERER'].'');
 
-  //teste git
-} ?>
+
+  echo "Cadastro inserido com sucesso!";
+} 
+?>
