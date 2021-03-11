@@ -114,4 +114,7 @@ function testa_input($data) {
 if ($soma_verificacao >= 3) {
   $query = "INSERT INTO `cadastro` (`id_cliente`, `nome`, `data_nascimento`, `cpf`, `telefone`, `email`) VALUES (NULL, '$nome', '$nascimento', '$cpf_formatado', '$telefone', '$email')";
   mysqli_query($conexao, $query);
+
+
+  //teste git
 } ?>
