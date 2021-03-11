@@ -40,7 +40,7 @@ while ($linha = mysqli_fetch_array($exibicao)) {
                 value="SIM"/> 
           
         <input type="submit" name="nao"
-                value="NÃo"/> 
+                value="NÃO"/> 
     </form>
 
 
