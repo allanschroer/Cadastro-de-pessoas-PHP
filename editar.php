@@ -138,8 +138,13 @@ if ($linha['id_cliente'] == $_GET['id']) {?>
     <input type="text" name="email" value="<?php echo $linha['email']?>">
     <span class="error"> <?php echo $emailErr;?></span><br><br>
     <input type="submit" value="Atualizar"><br>
+</form>
 <?php
-
+  
+  if (@$_GET['error'] == 'null') {
+    echo '<div class="msg_sucesso"><p>Cadastro atualizado com sucesso!</p></div>';
+    //echo "Cadastro atualziado com sucesso";
+  }
 }
 }
 
