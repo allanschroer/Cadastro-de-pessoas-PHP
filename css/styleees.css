@@ -1,0 +1,83 @@
+*{
+	margin: 0px;
+	padding: 0px;
+
+}
+
+header {
+	height: 115px;
+	background-color: #242424;
+}
+header h2{
+	padding: 20px;
+	color: lightblue;
+}
+
+
+.menu a{
+    transition-duration: 0.2s;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: lightblue;
+    text-decoration: none;
+    float: right;
+    padding: 10px;
+}
+.menu a:hover{
+    border-radius: 20px;
+    color: #262626;
+    background-color:rgb(173, 216, 230);
+}
+
+
+table{
+    margin-left: 10px;
+    border-collapse: collapse;;
+    padding: 10px;
+    text-align: center;
+}
+
+th, td {
+    border-bottom: 1px solid #26262634;
+    padding: 10px;
+}
+
+tr:nth-child(even) {background-color: rgba(173, 216, 230, 0.377)}
+
+
+
+
+.error {color: #FF0000;}
+
+.msg_sucesso{
+	border-color: #87c940;
+	color: #FFF;
+	background-color: #a0d468;
+}
+
+
+
+form{
+    font-weight:bold;
+    margin: 15px;
+}
+
+form input[type="text"]{
+    width: 350px;
+    font-size: 18px;
+    padding: 2px;
+
+}
+
+form input[type="submit"]{
+    font-size: 18px;
+    padding:5px;
+    background-color:#262626a4;
+    color:#fff;
+    font-weight:bold;
+    }
+
+.area_telefone{
+    width: 35px;
+}
