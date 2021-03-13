@@ -9,6 +9,12 @@ $nomeErr = $nascimentoErr = $cpfErr = $emailErr = $areaErr = $telefoneErr = "";
 $nome = $nascimento = $cpf = $telefone = $email = $cpf_formatado = "";
 $soma_verificacao = 0;
 
+if (@$_GET['error'] =='email'){
+  $emailErr = "O E-Mail inserido é inválido, verifique.";
+}
+
+
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   //verifica o nome
   if (empty($_POST["nome"])) {
@@ -69,25 +75,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   //formata telefone
   $telefone = ($_POST["telefone"]);
+  $ver_telefone = preg_replace("/[^0-9]/", "", $telefone);
+
+  if (strlen($ver_telefone)>11){
+
+  }
+  elseif (strlen($ver_telefone) < 9) { 
+    
+  } 
+  else{
+    $parte_1 = substr($ver_telefone,0,2);
+    $parte_2 = substr($ver_telefone, 2,-4);
+    $parte_3 = substr($ver_telefone, -4, 4);
+    $telefone = "(".$parte_1.")".$parte_2."-".$parte_3;
+  }
   
 
 
+
   //verifica o e-mail
+  $teste_email = "";
   if ($email = testa_input($_POST["email"]));
     // checagem do e-mail valido
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      $emailErr = "E-Mail precisa ser válido.";
-      $email = "";
+      $teste_email = "false";
     }
   }
 
   //função para testar o input
-function testa_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-}
+  function testa_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+  }
 
 
 while ($linha = mysqli_fetch_array($exibicao)) {?>
@@ -118,6 +139,7 @@ if ($linha['id_cliente'] == $_GET['id']) {?>
     <span class="error"> <?php echo $emailErr;?></span><br><br>
     <input type="submit" value="Atualizar"><br>
 <?php
+
 }
 }
 
@@ -126,8 +148,15 @@ if ($linha['id_cliente'] == $_GET['id']) {?>
 if ($soma_verificacao >= 3) {
     $id = $_GET['id'];
     $query = "UPDATE `cadastro` SET `nome` = '$nome', `data_nascimento` = '$nascimento', `cpf` = '$cpf_formatado', `telefone` = '$telefone', `email` = '$email' WHERE `cadastro`.`id_cliente` = '$id'";
-    mysqli_query($conexao, $query);
-    header('location:'.$_SERVER['HTTP_REFERER'].'');  
-    echo "Cadastro editado com sucesso!";
+
+    if ($teste_email == "false") {
+      mysqli_query($conexao, $query);
+      header("Refresh:0; url= editar.php?&id=".$id."&error=email");
+    }
+    else{
+      mysqli_query($conexao, $query);
+      header("Refresh:0; url= editar.php?&id=".$id."&error=null");
+    }
+      
   } 
 
