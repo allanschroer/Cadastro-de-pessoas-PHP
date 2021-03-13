@@ -8,6 +8,15 @@ include 'header.php';
 ?>
 <h2>Você realemte deseja exlcuir este cadastro?</h2>
 <table>
+  <tr>
+    <th>ID do cadastro</th>
+    <th>Nome completo</th>
+    <th>Data de nascimento</th>
+    <th>CPF</th>
+    <th>Telefone</th>
+    <th>E-Mail</th>
+  </tr>
+
 <?php
 while ($linha = mysqli_fetch_array($exibicao)) {
     if ($linha['id_cliente'] == $_GET['id']) {
