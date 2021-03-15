@@ -123,7 +123,7 @@ function testa_input($data) {
   <label>NOME COMPLETO:</label><br>
   <input type="text" name="nome" placeholder="Nome do cadastro">
   <span class="error">* <?php echo $nomeErr;?></span><br><br>
-  <label>DATA DE NASCIMENTO:</label><br>
+  <label>DATA DE NASCIMENTO (DD/MM/AAA):</label><br>
   <input type="text" name="nascimento" placeholder="Data de Nascimento">
   <span class="error">* <?php echo $nascimentoErr;?></span><br><br>
   <label>CPF:</label><br>
@@ -149,6 +149,9 @@ if ($soma_verificacao >= 3) {
   header('location:'.$_SERVER['HTTP_REFERER'].'');
 
 
-  echo "Cadastro inserido com sucesso!";
-} 
+  echo '<div class="msg_sucesso"><p>Cadastro inserido com sucesso!</p></div>';
+}
+elseif($soma_verificacao > 0 and $soma_verificacao <3) {
+  echo '<div class="msg_erro"><p>Cadastro não inserido, verifique os campos obrigatórios e tente novamente!</p></div>';
+}
 ?>
