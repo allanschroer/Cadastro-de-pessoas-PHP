@@ -145,10 +145,7 @@ function testa_input($data) {
 if ($soma_verificacao >= 3) {
   $query = "INSERT INTO `cadastro` (`id_cliente`, `nome`, `data_nascimento`, `cpf`, `telefone`, `email`) VALUES (NULL, '$nome', '$nascimento', '$cpf_formatado', '$telefone', '$email')";
   mysqli_query($conexao, $query);
-
-  header('location:'.$_SERVER['HTTP_REFERER'].'');
-
-
+  header("Refresh:0; url= cadastro.php?&cad=sucesso");
   echo '<div class="msg_sucesso"><p>Cadastro inserido com sucesso!</p></div>';
 }
 elseif($soma_verificacao > 0 and $soma_verificacao <3) {
