@@ -4,27 +4,27 @@
 include 'db.php';
 include 'header.php';
 
-// define variaveis vazias
+// define variaveis
 $nomeErr = $nascimentoErr = $cpfErr = $emailErr = $areaErr = $telefoneErr = "";
 $nome = $nascimento = $cpf = $telefone = $email = $cpf_formatado = "";
 $soma_verificacao = 0;
-
-if (@$_GET['error'] =='email'){
-  $emailErr = "O E-Mail inserido é inválido, verifique.";
-}
-
+$validade_campos = "";
+$id = $_GET['id'];
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   //verifica o nome
   if (empty($_POST["nome"])) {
     $nomeErr = "Nome é um campo obrigatório.";
+    $validade_campos = "nome";
   } 
   else {
     $nome = testa_input($_POST["nome"]);
     // checa se tem apenas caracteres
     if (!preg_match("/^[a-zA-Z ]*$/",$nome)) {
-      $nomeErr = "Apenas letras e espaços são permitidos.";}
+      $nomeErr = "Apenas letras e espaços são permitidos.";
+      $validade_campos = "nome-invalido";}
+
       else{
         $soma_verificacao =+1;
       }
@@ -32,8 +32,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   //verifica a data de nascimento
     if (empty($_POST["nascimento"])) {
-    $nascimentoErr = "Data de nascimento é obrigatório";
+    $validade_campos = "nascimento";
   } else {
+    strtotime($nascimento);
     $nascimento = testa_input($_POST["nascimento"]);
     $soma_verificacao +=1;
   }
@@ -41,8 +42,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   //verifica o CPF
     if (empty($_POST["cpf"])) {
-      $cpfErr = "CPF é obrigatório.";
-  } else {
+      $validade_campos = "cpf";
+    }
+    else {
       $cpf = testa_input($_POST["cpf"]);
       //retira qualquer coisa que nao seja numero do cpf
       $cpf = preg_replace("/[^0-9]/","" ,$cpf);
@@ -59,17 +61,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $consulta_cpf = $conexao->query("SELECT * FROM `cadastro` WHERE `cpf` LIKE '$cpf_formatado'");
 
       if(mysqli_num_rows($consulta_cpf) > 1){
-        $cpfErr = "O CPF inserido já existe.";
+        $validade_campos = "cpf-existe";
       }
       else{
         $soma_verificacao +=1;
       }
     }
       else{
-        $cpfErr = "O CPF digitado é invalido.";
+        $validade_campos = "cpf-invalido";
     }
-  
-
   }
   
 
@@ -110,11 +110,64 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     return $data;
   }
 
+  switch(@$_GET['error']){
+    case 'null':
+      echo '<div class="msg_sucesso"><p>Cadastro atualizado com sucesso!</p></div>';
+      break;
+    case 'nome':
+      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+      $nomeErr = "Nome é um campo obrigatório.";
+      break;
+    case 'nome-invalido':
+      $nomeErr = "Apenas letras e espaços permitidos no nome.";
+      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+      break;
+    case 'cpf':
+      $cpfErr = "CPF é um campo obrigatório.";
+      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+      break;
+    case 'cpf-invalido':
+      $cpfErr = "O CPF digitado é invalido.";
+      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+      break;
+    case 'cpf-existe':
+      $cpfErr = "O CPF digitado já existe.";
+      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+      break;
+    case 'email':
+      echo '<div class="msg_sucesso"><p>Cadastro atualizado com sucesso!</p></div>';
+      $emailErr = "O E-mail inserio é invalido, por favor verifique";
+      break;
+  }
 
-while ($linha = mysqli_fetch_array($exibicao)) {?>
-<?php 
-if ($linha['id_cliente'] == $_GET['id']) {?>
 
+  
+  switch ($validade_campos) {
+    case 'nome':
+      header("Refresh:0; url= editar.php?&id=".$id."&error=nome");
+      break;
+    case 'nome-invalido':
+      header("Refresh:0; url= editar.php?&id=".$id."&error=nome-invalido");
+    break;   
+    case 'nascimento':
+      header("Refresh:0; url= editar.php?&id=".$id."&error=nascimento");
+      break;
+    case 'cpf':
+      header("Refresh:0; url= editar.php?&id=".$id."&error=cpf");
+      break; 
+    case 'cpf-existe':
+      header("Refresh:0; url= editar.php?&id=".$id."&error=cpf-existe");
+      break;
+    case 'cpf-invalido':
+      header("Refresh:0; url= editar.php?&id=".$id."&error=cpf-invalido");
+      break; 
+  }
+
+
+
+  while ($linha = mysqli_fetch_array($exibicao)) {?>
+  <?php 
+  if ($linha['id_cliente'] == $_GET['id']) {?>
     <h2 class ="espaco_titulo">Editar cadastro:</h2>
     <form method="post" action="">
 
@@ -123,7 +176,7 @@ if ($linha['id_cliente'] == $_GET['id']) {?>
     <input type="text" name="nome" value="<?php echo $linha['nome']?>">
     <span class="error">* <?php echo $nomeErr;?></span><br><br>
 
-    <label>DATA DE NASCIMENTO:</label><br>
+    <label>DATA DE NASCIMENTO (DD/MM/AAAA):</label><br>
         <input type="text" name="nascimento" placeholder="Data de Nascimento" value="<?php echo $linha['data_nascimento']?>">
     <span class="error">* <?php echo $nascimentoErr;?></span><br><br>
 
@@ -138,19 +191,16 @@ if ($linha['id_cliente'] == $_GET['id']) {?>
     <input type="text" name="email" value="<?php echo $linha['email']?>">
     <span class="error"> <?php echo $emailErr;?></span><br><br>
     <input type="submit" value="Atualizar"><br>
-</form>
-<?php
-  
-  if (@$_GET['error'] == 'null') {
-    echo '<div class="msg_sucesso"><p>Cadastro atualizado com sucesso!</p></div>';
-    //echo "Cadastro atualziado com sucesso";
+  </form>
+  <?php 
+    }
   }
-}
-}
 
 
 
-if ($soma_verificacao >= 3) {
+  
+
+  if ($soma_verificacao >= 3) {
     $id = $_GET['id'];
     $query = "UPDATE `cadastro` SET `nome` = '$nome', `data_nascimento` = '$nascimento', `cpf` = '$cpf_formatado', `telefone` = '$telefone', `email` = '$email' WHERE `cadastro`.`id_cliente` = '$id'";
 
@@ -159,9 +209,7 @@ if ($soma_verificacao >= 3) {
       header("Refresh:0; url= editar.php?&id=".$id."&error=email");
     }
     else{
-      mysqli_query($conexao, $query);
-      header("Refresh:0; url= editar.php?&id=".$id."&error=null");
-    }
-      
-  } 
-
+    mysqli_query($conexao, $query);
+    header("Refresh:0; url= editar.php?&id=".$id."&error=null"); 
+  }
+}
