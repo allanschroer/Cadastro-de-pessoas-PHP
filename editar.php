@@ -37,7 +37,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     strtotime($nascimento);
     $nascimento = testa_input($_POST["nascimento"]);
     $soma_verificacao +=1;
+    $nascimento = preg_replace("/[^0-9]/","" ,$nascimento);
+
+    if (strlen($nascimento) == 8) {
+      $bloco_nasc1 = substr($nascimento,0,2);
+      $bloco_nasc2 = substr($nascimento,2,2);
+      $bloco_nasc3 = substr($nascimento,4,4);
+      $nascimento_form = $bloco_nasc3.'-'.$bloco_nasc2.'-'.$bloco_nasc1;
+    }
   }
+  
+
 
 
   //verifica o CPF
@@ -132,11 +142,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       break; 
   }
 
-
   //formulário de exibição na tela
   while ($linha = mysqli_fetch_array($exibicao)) {?>
+
   <?php 
-  if ($linha['id_cliente'] == $_GET['id']) {?>
+  if ($linha['id_cliente'] == $_GET['id']) {
+    
+    ?>
     <h2 class ="espaco_titulo">Editar cadastro:</h2>
     <form method="post" action="">
 
@@ -146,7 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <span class="error">* <?php echo $nomeErr;?></span><br><br>
 
     <label>DATA DE NASCIMENTO (DD/MM/AAAA):</label><br>
-        <input type="text" name="nascimento" placeholder="Data de Nascimento" value="<?php echo $linha['data_nascimento']?>">
+        <input type="text" name="nascimento" placeholder="Data de Nascimento" value="<?php echo date('d/m/Y',strtotime($linha['data_nascimento']));?>">
     <span class="error">* <?php echo $nascimentoErr;?></span><br><br>
 
     <label>CPF:</label><br>
@@ -206,7 +218,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   //evia DB
   if ($soma_verificacao >= 3) {
     $id = $_GET['id'];
-    $query = "UPDATE `cadastro` SET `nome` = '$nome', `data_nascimento` = '$nascimento', `cpf` = '$cpf_formatado', `telefone` = '$telefone', `email` = '$email' WHERE `cadastro`.`id_cliente` = '$id'";
+    $query = "UPDATE `cadastro` SET `nome` = '$nome', `data_nascimento` = '$nascimento_form', `cpf` = '$cpf_formatado', `telefone` = '$telefone', `email` = '$email' WHERE `cadastro`.`id_cliente` = '$id'";
 
     if ($teste_email == "false") {
       mysqli_query($conexao, $query);
