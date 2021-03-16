@@ -81,7 +81,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   }
   elseif (strlen($ver_telefone) < 9) { 
-    
+
   } 
   else{
     $parte_1 = substr($ver_telefone,0,2);
@@ -89,8 +89,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $parte_3 = substr($ver_telefone, -4, 4);
     $telefone = "(".$parte_1.")".$parte_2."-".$parte_3;
   }
-  
-
 
 
   //verifica o e-mail
@@ -110,44 +108,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     return $data;
   }
 
-  switch(@$_GET['error']){
-    case 'null':
-      echo '<div class="msg_sucesso"><p>Cadastro atualizado com sucesso!</p></div>';
-      break;
-    case 'nome':
-      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
-      $nomeErr = "Nome é um campo obrigatório.";
-      break;
-    case 'nome-invalido':
-      $nomeErr = "Apenas letras e espaços permitidos no nome.";
-      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
-      break;
-    case 'cpf':
-      $cpfErr = "CPF é um campo obrigatório.";
-      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
-      break;
-    case 'cpf-invalido':
-      $cpfErr = "O CPF digitado é invalido.";
-      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
-      break;
-    case 'cpf-existe':
-      $cpfErr = "O CPF digitado já existe.";
-      echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
-      break;
-    case 'email':
-      echo '<div class="msg_sucesso"><p>Cadastro atualizado com sucesso!</p></div>';
-      $emailErr = "O E-mail inserio é invalido, por favor verifique";
-      break;
-  }
-
-
-  
+  //validação de campos, manda erro para o link
   switch ($validade_campos) {
     case 'nome':
       header("Refresh:0; url= editar.php?&id=".$id."&error=nome");
+      $nomeErr = "Nome é um campo obrigatório.";
       break;
     case 'nome-invalido':
       header("Refresh:0; url= editar.php?&id=".$id."&error=nome-invalido");
+      $nomeErr = "Apenas letras e espaços são permitidos.";
     break;   
     case 'nascimento':
       header("Refresh:0; url= editar.php?&id=".$id."&error=nascimento");
@@ -164,7 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
 
-
+  //formulário de exibição na tela
   while ($linha = mysqli_fetch_array($exibicao)) {?>
   <?php 
   if ($linha['id_cliente'] == $_GET['id']) {?>
@@ -196,10 +165,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
   }
 
+    //mensagens de rro caso tenha algo de errado
+    switch(@$_GET['error']){
+      case 'null':
+        echo '<div class="msg_sucesso"><p>Cadastro atualizado com sucesso!</p></div>';
+        break;
+      case 'nome':
+        echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+        $nomeErr = "Nome é um campo obrigatório.";
+        break;
+      case 'nome-invalido':
+        $nomeErr = "Apenas letras e espaços permitidos no nome.";
+        echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+        break;
+      case 'nascimento':
+          $nascimentoErr = "Data de nascimento é um campo obrigatório.";
+          echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+          break;
+      case 'cpf':
+        $cpfErr = "CPF é um campo obrigatório.";
+        echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+        break;
+      case 'cpf-invalido':
+        $cpfErr = "O CPF digitado é invalido.";
+        echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+        break;
+      case 'cpf-existe':
+        $cpfErr = "O CPF digitado já existe.";
+        echo '<div class="msg_erro"><p>Cadastro não foi atualizado!</p></div>';
+        break;
+      case 'email':
+        echo '<div class="msg_sucesso"><p>Cadastro atualizado com sucesso!</p></div>';
+        $emailErr = "O E-mail inserio é invalido, por favor verifique";
+        break;
+  
+    }
 
 
   
-
+  //evia DB
   if ($soma_verificacao >= 3) {
     $id = $_GET['id'];
     $query = "UPDATE `cadastro` SET `nome` = '$nome', `data_nascimento` = '$nascimento', `cpf` = '$cpf_formatado', `telefone` = '$telefone', `email` = '$email' WHERE `cadastro`.`id_cliente` = '$id'";
