@@ -8,17 +8,21 @@ include 'header.php';
 $nomeErr = $nascimentoErr = $cpfErr = $emailErr = $areaErr = $telefoneErr = "";
 $nome = $nascimento = $cpf = $telefone = $email = $cpf_formatado = "";
 $soma_verificacao = 0;
+$cont_erros = 0;
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   //verifica o nome
   if (empty($_POST["nome"])) {
     $nomeErr = "Nome é um campo obrigatório.";
+    $cont_erros +=1;
+
   } 
   else {
     $nome = testa_input($_POST["nome"]);
     // checa se tem apenas caracteres
     if (!preg_match("/^[a-zA-Z ]*$/",$nome)) {
-      $nomeErr = "Apenas letras e espaços são permitidos.";}
+      $nomeErr = "Apenas letras e espaços são permitidos.";
+      $cont_erros +=1;}
       else{
         $soma_verificacao =+1;
       }
@@ -27,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   //verifica a data de nascimento
     if (empty($_POST["nascimento"])) {
     $nascimentoErr = "Data de nascimento é obrigatório";
+    $cont_erros +=1;
   } else {
     $nascimento = testa_input($_POST["nascimento"]);
     $soma_verificacao +=1;
@@ -36,6 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   //verifica o CPF
     if (empty($_POST["cpf"])) {
       $cpfErr = "CPF é obrigatório.";
+      $cont_erros +=1;
   } else {
       $cpf = testa_input($_POST["cpf"]);
       //retira qualquer coisa que nao seja numero do cpf
@@ -54,6 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       if(mysqli_num_rows($consulta_cpf) > 0){
         $cpfErr = "O CPF inserido já existe.";
+        $cont_erros +=1;
       }
       else{
         $soma_verificacao +=1;
@@ -61,6 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
       else{
         $cpfErr = "O CPF digitado é invalido.";
+        $cont_erros +=1;
     }
   
 
@@ -71,7 +79,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $area_telefone = ($_POST["area_telefone"]);
   $area_telefone = preg_replace("/[^0-9]/","" ,$area_telefone);
   
-
   if (strlen($area_telefone)>2) {
     $areaErr = "DDD invalido.";
     $area_telefone = "";
@@ -97,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
   //verifica o e-mail
-  if ($email = testa_input($_POST["email"]));
+  if ($email = testa_input($_POST["email"]))
     // checagem do e-mail valido
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
       $emailErr = "E-Mail precisa ser válido.";
@@ -106,19 +113,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
 
   //função para testar o input
-function testa_input($data) {
-  $data = trim($data);
-  $data = stripslashes($data);
-  $data = htmlspecialchars($data);
-  return $data;
-}
+  function testa_input($data) {
+    $data = trim($data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data);
+    return $data;
+  }
 
 
-
-// FORMULARIO DE CADASTRO
-
-?>
-
+// FORMULARIO DE CADASTRO ?>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
   <label>NOME COMPLETO:</label><br>
   <input type="text" name="nome" placeholder="Nome do cadastro">
@@ -146,9 +149,16 @@ if ($soma_verificacao >= 3) {
   $query = "INSERT INTO `cadastro` (`id_cliente`, `nome`, `data_nascimento`, `cpf`, `telefone`, `email`) VALUES (NULL, '$nome', '$nascimento', '$cpf_formatado', '$telefone', '$email')";
   mysqli_query($conexao, $query);
   header("Refresh:0; url= cadastro.php?&cad=sucesso");
+}
+//Mensagem caso nao cadastrado com sucesso
+elseif($cont_erros>0) {
+  echo '<div class="msg_erro"><p>Cadastro não inserido, verifique os campos obrigatórios e tente novamente!</p></div>';
+  echo $cont_erros;
+}
+//mensagem de sucesso
+if (@$_GET['cad']=='sucesso') {
   echo '<div class="msg_sucesso"><p>Cadastro inserido com sucesso!</p></div>';
 }
-elseif($soma_verificacao > 0 and $soma_verificacao <3) {
-  echo '<div class="msg_erro"><p>Cadastro não inserido, verifique os campos obrigatórios e tente novamente!</p></div>';
-}
+
+
 ?>
