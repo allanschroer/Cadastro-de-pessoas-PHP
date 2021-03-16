@@ -15,7 +15,7 @@
 						while ($linha = mysqli_fetch_array($exibicao)) {
 							echo '<tr><td>'.$linha['id_cliente'].'</td>';
 							echo '<td>'.$linha['nome'].'</td>';
-							echo '<td>'.$linha['data_nascimento'].'</td>';
+							echo '<td>'.date('d/m/Y',strtotime($linha['data_nascimento']));'</td>';
 							echo '<td>'.$linha['cpf'].'</td>';
 							echo '<td>'.$linha['telefone'].'</td>';
 							echo '<td>'.$linha['email'].'</td>';
