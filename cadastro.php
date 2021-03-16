@@ -35,6 +35,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   } else {
     $nascimento = testa_input($_POST["nascimento"]);
     $soma_verificacao +=1;
+    $nascimento = preg_replace("/[^0-9]/","" ,$nascimento);
+  }
+  if (strlen($nascimento) == 8) {
+    $bloco_nasc1 = substr($nascimento,0,2);
+    $bloco_nasc2 = substr($nascimento,2,2);
+    $bloco_nasc3 = substr($nascimento,4,4);
+    $nascimento_form = $bloco_nasc3.'-'.$bloco_nasc2.'-'.$bloco_nasc1;
   }
 
 
@@ -78,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   //formata telefone
   $area_telefone = ($_POST["area_telefone"]);
   $area_telefone = preg_replace("/[^0-9]/","" ,$area_telefone);
-  
+
   if (strlen($area_telefone)>2) {
     $areaErr = "DDD invalido.";
     $area_telefone = "";
@@ -146,7 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 //CHECAGEM DE CAMPOS PREENCHIDOS
 if ($soma_verificacao >= 3) {
-  $query = "INSERT INTO `cadastro` (`id_cliente`, `nome`, `data_nascimento`, `cpf`, `telefone`, `email`) VALUES (NULL, '$nome', '$nascimento', '$cpf_formatado', '$telefone', '$email')";
+  $query = "INSERT INTO `cadastro` (`id_cliente`, `nome`, `data_nascimento`, `cpf`, `telefone`, `email`) VALUES (NULL, '$nome', '$nascimento_form', '$cpf_formatado', '$telefone', '$email')";
   mysqli_query($conexao, $query);
   header("Refresh:0; url= cadastro.php?&cad=sucesso");
 }
