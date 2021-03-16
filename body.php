@@ -10,11 +10,8 @@
 						<th>E-Mail</th>
 						<th>Editar</th>
 						<th>Deletar</th>
-
 					</tr>
-
 					<?php
-
 						while ($linha = mysqli_fetch_array($exibicao)) {
 							echo '<tr><td>'.$linha['id_cliente'].'</td>';
 							echo '<td>'.$linha['nome'].'</td>';
@@ -25,10 +22,8 @@
 							echo '<td><a href="editar.php?&id='.$linha['id_cliente'].'"><button>Editar</button></td>';
 							echo '<td><a href="deletar.php?&id='.$linha['id_cliente'].'"><button>Deletar</button></td>';
 						}
-
 					?>
 					
-
 				</table>
 			</div>
 		</div>
